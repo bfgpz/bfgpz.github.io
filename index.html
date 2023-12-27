@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BfgPz Website</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/hejteri/hejteri.github.io/main/hejteri/hejteri.ico" type="image/x-icon">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1f2c39;
+            color: #bdc3c7;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #19252f;
+            color: #bdc3c7;
+            padding: 0.3cm;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            margin-right: 0.5cm;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        nav ul li {
+            margin-right: 20px;
+        }
+
+        a {
+            color: #bdc3c7;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 4px;
+            transition: border-bottom 0.3s;
+        }
+
+        a:hover {
+            border-bottom: 2px solid #256eff;
+        }
+
+        .container-box {
+            margin: 100px 20% 0 20%;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #19252f;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container-box {
+                margin: 100px 5% 0 5%;
+            }
+        }
+
+        section {
+            background-color: #273746;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: #bdc3c7;
+            text-align: center;
+            margin: 0 0 10px;
+        }
+
+        footer {
+            background-color: #19252f;
+            color: #bdc3c7;
+            text-align: center;
+            padding: 0.5em;
+            margin-top: auto;
+        }
+
+        .footer-content p {
+            margin: 2px 0;
+            font-weight: bold;
+            opacity: 0.03;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            background-color: #19252f;
+            color: #bdc3c7;
+        }
+
+        button {
+            background-color: #19252f;
+            cursor: pointer;
+        }
+
+        #searchResults {
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1><a href="https://bfgpz.github.io/">BfgPz Website</a></h1>
+        <nav>
+            <ul>
+                <li><a href="https://bfgpz.github.io/redirect?url=https://discord.gg/bza8BnFWdh">Faq</a></li>
+                <li><a id="panelbut" href="https://bfgpz.github.io/panel">Panel</a></li>
+                <li><a id="loginbut" href="#"> </a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container-box">
+        <section>
+            <h2>Search For Vip-Players</h2>
+            <form id="searchForm">
+                <label for="searchGrowid">Search GrowID:</label>
+                <input type="text" id="searchGrowid" required>
+                <button type="button" onclick="searchGrowID()">Search</button>
+            </form>
+        </section>
+
+        <section id="searchResultsSection" style="display: none;">
+            <h2>Results</h2>
+            <div id="searchResults"></div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>Made By ROOT256</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxezHvx_VPjMv_w1vQprKuQC3bl7z0jK0",
+            authDomain: "bfgpzo.firebaseapp.com",
+            databaseURL: "https://bfgpzo-default-rtdb.firebaseio.com",
+            projectId: "bfgpzo",
+            storageBucket: "bfgpzo.appspot.com",
+            messagingSenderId: "821260336906",
+            appId: "1:821260336906:web:f5a9748620aec518fb84f3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function checkLoginStatus() {
+            var loginButton = document.getElementById('loginbut');
+            var panelButton = document.getElementById('panelbut');
+
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    loginButton.textContent = 'Logout';
+                    loginButton.setAttribute('href', '#');
+                    loginButton.setAttribute('onclick', 'logout()');
+                    loginButton.style.marginLeft = '0px';
+                    panelButton.style.display = 'block';
+                    panelButton.style.visibility = 'visible';
+                } else {
+                    loginButton.textContent = 'Login';
+                    loginButton.setAttribute('href', 'https://bfgpz.github.io/panel/login');
+                    loginButton.removeAttribute('onclick');
+                    panelButton.style.display = 'none';
+                    panelButton.style.visibility = 'hidden';
+                    loginButton.style.marginLeft = '-20px';
+                }
+            });
+        }
+
+        function logout() {
+            firebase.auth().signOut().then(function () {
+                loginButton.textContent = 'Login';
+                loginButton.setAttribute('href', 'https://bfgpz.github.io/panel/login');
+                loginButton.removeAttribute('onclick');
+            }).catch(function (error) {
+                console.error('Error during logout:', error);
+            });
+        }
+
+        function searchGrowID() {
+            const searchGrowidInput = document.getElementById('searchGrowid').value;
+
+            db.collection('growids')
+                .where('growid', '>=', searchGrowidInput)
+                .where('growid', '<=', searchGrowidInput + '\uf8ff')
+                .get()
+                .then(function (querySnapshot) {
+                    const resultsContainer = document.getElementById('searchResults');
+                    resultsContainer.innerHTML = '';
+
+                    querySnapshot.forEach(function (doc) {
+                        const data = doc.data();
+                        const growidResult = document.createElement('p');
+                        growidResult.textContent = data.growid;
+                        growidResult.addEventListener('click', function () {
+                            window.location.href = 'profile.html?id=' + data.growid;
+                        });
+                        resultsContainer.appendChild(growidResult);
+                    });
+
+                    if (querySnapshot.empty) {
+                        resultsContainer.innerHTML = '<p>No results found.</p>';
+                    }
+
+                    document.getElementById('searchResultsSection').style.display = 'block';
+                })
+                .catch(function (error) {
+                    console.error('Error searching GrowID. Please try again.', error);
+                });
+        }
+
+        window.onload = function () {
+            checkLoginStatus();
+        };
+    </script>
+
+</body>
+
+</html>
