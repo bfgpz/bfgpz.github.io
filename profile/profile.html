@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BfgPz Website</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/hejteri/hejteri.github.io/main/hejteri/hejteri.ico" type="image/x-icon">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1f2c39;
+            color: #bdc3c7;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #19252f;
+            color: #bdc3c7;
+            padding: 0.3cm;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            margin-right: 0.5cm;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        nav ul li {
+            margin-right: 20px;
+        }
+
+        a {
+            color: #bdc3c7;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 4px;
+            transition: border-bottom 0.3s;
+        }
+
+        a:hover {
+            border-bottom: 2px solid #256eff;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container-box {
+                margin: 100px 5% 0 5%;
+            }
+        }
+
+        .container-box {
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #19252f;
+            margin: 100px 5% 20px 5%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        section {
+            background-color: #273746;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            flex: 1;
+            padding-bottom: 80px;
+        }
+
+        section p {
+            margin-bottom: -15px;
+        }
+
+        h2 {
+            color: #bdc3c7;
+            text-align: center;
+            margin: 0 0 10px;
+        }
+
+        footer {
+            background-color: #19252f;
+            color: #bdc3c7;
+            text-align: center;
+            padding: 0.5em;
+            margin-top: auto;
+        }
+
+        .footer-content p {
+            margin: 2px 0;
+            font-weight: bold;
+            opacity: 0.03;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            background-color: #19252f;
+            color: #bdc3c7;
+        }
+
+        button {
+            background-color: #19252f;
+            cursor: pointer;
+        }
+
+        #searchResults {
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1><a href="https://bfgpz.github.io/">BfgPz Website</a></h1>
+        <nav>
+            <ul>
+                <li><a href="https://bfgpz.github.io/redirect?url=https://discord.gg/bza8BnFWdh">Faq</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="container-box">
+        <section>
+            <h2>Profile</h2>
+            <div id="profileContent">
+                <!-- Display GrowID profile content here -->
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>Made By ROOT256</p>
+        </div>
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxezHvx_VPjMv_w1vQprKuQC3bl7z0jK0",
+            authDomain: "bfgpzo.firebaseapp.com",
+            databaseURL: "https://bfgpzo-default-rtdb.firebaseio.com",
+            projectId: "bfgpzo",
+            storageBucket: "bfgpzo.appspot.com",
+            messagingSenderId: "821260336906",
+            appId: "1:821260336906:web:f5a9748620aec518fb84f3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        if (id) {
+            const db = firebase.firestore();
+
+            db.collection('growids')
+                .where('growid', '==', id)
+                .get()
+                .then(function (querySnapshot) {
+                    const profileContent = document.getElementById('profileContent');
+
+                    if (!querySnapshot.empty) {
+                        const data = querySnapshot.docs[0].data();
+
+                        profileContent.innerHTML = '';
+
+                        profileContent.innerHTML += `<p>GrowID: ${data.growid || ''}</p>`;
+                        profileContent.innerHTML += `<p>Wls: ${data.wls || ''}</p>`;
+
+                        if (data.days === 'inf') {
+                            profileContent.innerHTML += `<p>Status: <span style="color: green;">Active (∞ Days Left)</span></p>`;
+                        } else {
+                            const currentDate = new Date();
+                            const growIDDate = new Date(data.date);
+                            const expirationDays = parseInt(data.days) || 0;
+
+                            growIDDate.setDate(growIDDate.getDate() + expirationDays);
+
+                            if (currentDate > growIDDate) {
+                                profileContent.innerHTML += `<p>Status: <span style="color: red;">Expired</span></p>`;
+                            } else {
+                                const remainingDays = Math.ceil((growIDDate - currentDate) / (1000 * 60 * 60 * 24));
+                                profileContent.innerHTML += `<p>Status: <span style="color: green;">Active</span><span style="opacity: 0.5;"> (${remainingDays} Days Left)</span></p>`;
+                            }
+                        }
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(function (error) {
+                    
+                    alert('Error fetching.');
+					window.location.href = 'index.html';
+                });
+        } else {
+            alert('No GrowID specified');
+			window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>
