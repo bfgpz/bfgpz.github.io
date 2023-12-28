@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BfgPz Panel</title>
+	<style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1f2c39;
+            color: #bdc3c7;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #19252f;
+            color: #bdc3c7;
+            padding: 0.3cm;
+            text-align: center;
+        }
+
+        h1 {
+            margin: 0;
+            margin-right: 0.5cm;
+        }
+
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        nav ul li {
+            margin-right: 20px;
+        }
+
+        a {
+            color: #bdc3c7;
+            text-decoration: none;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+            padding-bottom: 4px;
+            transition: border-bottom 0.3s;
+        }
+
+        a:hover {
+            border-bottom: 2px solid #256eff;
+        }
+
+        .container-box {
+            margin: 100px 20% 0 20%;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #19252f;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container-box {
+                margin: 100px 5% 0 5%;
+            }
+        }
+
+        section {
+            background-color: #273746;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: #bdc3c7;
+            text-align: center;
+            margin: 0 0 10px;
+        }
+
+        footer {
+            background-color: #19252f;
+            color: #bdc3c7;
+            text-align: center;
+            padding: 0.5em;
+            margin-top: auto;
+        }
+
+        .footer-content p {
+            margin: 2px 0;
+            font-weight: bold;
+            opacity: 0.03;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            color: #bdc3c7;
+        }
+
+        td, th {
+            border: 1px solid #bdc3c7;
+            padding: auto;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 0;
+        }
+
+        th {
+            background-color: #273746;
+            color: #bdc3c7;
+            line-height: 1;
+        }
+
+        button {
+            background-color: #19252f;
+            color: #bdc3c7;
+            padding: 1px 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 0px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #273746;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1><a href="https://bfgpz.github.io/">BfgPz Panel</a></h1>
+        <nav>
+            <ul>
+                <li><a href="https://bfgpz.github.io/">Home</a></li>
+				<li><a href="https://bfgpz.github.io/panel/create">Create</a></li>
+                <li><a onclick="logout()" href="#">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container-box">
+        <section>
+            <h2>Manage</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="growid-cell">GrowID</th>
+                        <th class="status-cell">Status</th>
+                        <th class="action-cell">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="growidTableBody"></tbody>
+            </table>
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>Made By ROOT256</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxezHvx_VPjMv_w1vQprKuQC3bl7z0jK0",
+            authDomain: "bfgpzo.firebaseapp.com",
+            databaseURL: "https://bfgpzo-default-rtdb.firebaseio.com",
+            projectId: "bfgpzo",
+            storageBucket: "bfgpzo.appspot.com",
+            messagingSenderId: "821260336906",
+            appId: "1:821260336906:web:f5a9748620aec518fb84f3"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function checkLoginStatus() {
+
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+
+                } else {
+					window.location.href = 'https://bfgpz.github.io/panel/login';
+                }
+            });
+        }
+
+        function populateGrowIDsTable() {
+            const growidTableBody = document.getElementById('growidTableBody');
+
+            db.collection('growids')
+                .get()
+                .then(function (querySnapshot) {
+                    querySnapshot.forEach(function (doc) {
+                        const data = doc.data();
+                        const growidRow = document.createElement('tr');
+
+                        const growidCell = document.createElement('td');
+                        growidCell.textContent = data.growid.length > 6 ? data.growid.substring(0, 5) + '...' : data.growid;
+                        growidRow.appendChild(growidCell);
+
+                        const statusCell = document.createElement('td');
+                        statusCell.innerHTML = getStatusHTML(data);
+                        growidRow.appendChild(statusCell);
+
+                        const actionCell = document.createElement('td');
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.addEventListener('click', function () {
+                            deleteGrowID(data.growid);
+                        });
+                        actionCell.appendChild(deleteButton);
+
+                        const viewProfileButton = document.createElement('button');
+                        viewProfileButton.textContent = 'Profile';
+                        viewProfileButton.addEventListener('click', function () {
+                            viewProfile(data.growid);
+                        });
+                        actionCell.appendChild(viewProfileButton);
+
+                        growidRow.appendChild(actionCell);
+
+                        growidTableBody.appendChild(growidRow);
+                    });
+                })
+                .catch(function (error) {
+                    console.error('Error populating GrowIDs table:', error);
+                });
+        }
+
+        function getStatusHTML(data) {
+            const profileContent = document.createElement('div');
+
+            if (data.days === 'inf') {
+                profileContent.innerHTML = `<p>Status: <span style="color: green;">∞ Days</span></p>`;
+            } else {
+                const currentDate = new Date();
+                const growIDDate = new Date(data.date);
+                const expirationDays = parseInt(data.days) || 0;
+
+                growIDDate.setDate(growIDDate.getDate() + expirationDays);
+
+                if (currentDate > growIDDate) {
+                    profileContent.innerHTML = `<p><span style="color: red;">Expired</span></p>`;
+                } else {
+                    const remainingDays = Math.ceil((growIDDate - currentDate) / (1000 * 60 * 60 * 24));
+                    profileContent.innerHTML = `<p><span style="color: green;">${remainingDays} Days</span></p>`;
+                }
+            }
+
+            return profileContent.innerHTML;
+        }
+
+        function deleteGrowID(growid) {
+            var confirmDelete = confirm("Delete GrowID?");
+
+            if (confirmDelete) {
+                const growidsCollection = db.collection('growids');
+
+                growidsCollection.where('growid', '==', growid)
+                    .get()
+                    .then(querySnapshot => {
+                        querySnapshot.forEach(doc => {
+                            doc.ref.delete().then(() => {
+                                console.log(`Document with GrowID '${growid}' successfully deleted.`);
+                                clearGrowIDsTable();
+                                populateGrowIDsTable();
+                            }).catch(error => {
+                                console.error('Error deleting document:', error);
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error getting documents:', error);
+                    });
+            }
+        }
+
+        function clearGrowIDsTable() {
+            const growidTableBody = document.getElementById('growidTableBody');
+            growidTableBody.innerHTML = '';
+        }
+
+        function viewProfile(growid) {
+            window.location.href = 'profile.html?id=' + growid;
+        }
+		
+		function logout() {
+            firebase.auth().signOut().then(function () {
+                checkLoginStatus();
+            }).catch(function (error) {
+                console.error('Error during logout:', error);
+            });
+        }
+
+        window.onload = function () {
+            checkLoginStatus();
+            populateGrowIDsTable();
+        };
+    </script>
+</body>
+
+</html>
