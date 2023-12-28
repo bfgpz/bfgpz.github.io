@@ -120,40 +120,40 @@
             cursor: pointer;
         }
 
-            .error-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(8px);
-      z-index: 900;
-    }
+        .error-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 900;
+        }
 
-    .error-box {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 20px;
-      background-color: #273746;
-      color: #bdc3c7;
-      border: 5px solid #19252f;
-      border-radius: 10px;
-      text-align: center;
-      z-index: 1000;
-    }
+        .error-box {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #273746;
+            color: #bdc3c7;
+            border: 5px solid #19252f;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
 
-    .error-box button {
-      margin-top: 15px;
-      margin-bottom: -15px;
-      padding: 8px 16px;
-      cursor: pointer;
-    }
-        
+        .error-box button {
+            margin-top: 15px;
+            margin-bottom: -15px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 
@@ -168,12 +168,12 @@
             </ul>
         </nav>
     </header>
-    
-<div id="error-overlay" class="error-overlay"></div>
-<div id="error-box" class="error-box">
-   <span id="error-text"></span>
-   <button onclick="closeErrorBox()">Close</button>
-</div>
+
+    <div id="error-overlay" class="error-overlay"></div>
+    <div id="error-box" class="error-box">
+        <span id="error-text"></span>
+        <button onclick="closeErrorBox()">Close</button>
+    </div>
 
     <div class="container-box">
         <section>
@@ -248,63 +248,60 @@
             });
         }
 
-function searchGrowID() {
-    const searchGrowidInput = document.getElementById('searchGrowid').value;
+        function searchGrowID() {
+            const searchGrowidInput = document.getElementById('searchGrowid').value;
 
-    // Check if the search input is empty
-    if (!searchGrowidInput.trim()) {
-        showErrorBox("Please Enter GrowId");
-        return;
-    }
-
-    db.collection('growids')
-        .where('growid', '>=', searchGrowidInput)
-        .where('growid', '<=', searchGrowidInput + '\uf8ff')
-        .get()
-        .then(function (querySnapshot) {
-            const resultsContainer = document.getElementById('searchResults');
-            resultsContainer.innerHTML = '';
-
-            querySnapshot.forEach(function (doc) {
-                const data = doc.data();
-                const growidResult = document.createElement('p');
-                growidResult.textContent = data.growid;
-                growidResult.addEventListener('click', function () {
-                    window.location.href = 'https://bfgpz.github.io/profile/?id=' + data.growid;
-                });
-                resultsContainer.appendChild(growidResult);
-            });
-
-            if (querySnapshot.empty) {
-                resultsContainer.innerHTML = '<p>No results found.</p>';
+            if (!searchGrowidInput.trim()) {
+                showErrorBox("Please Enter GrowId");
+                return;
             }
 
-            document.getElementById('searchResultsSection').style.display = 'block';
-        })
-        .catch(function (error) {
-            showErrorBox("Error searching GrowID. Please try again.");
-            console.error('Error searching GrowID. Please try again.', error);
-        });
-}
+            db.collection('growids')
+                .where('growid', '>=', searchGrowidInput)
+                .where('growid', '<=', searchGrowidInput + '\uf8ff')
+                .get()
+                .then(function (querySnapshot) {
+                    const resultsContainer = document.getElementById('searchResults');
+                    resultsContainer.innerHTML = '';
 
-function showErrorBox(errorMessage) {
-    const errorOverlay = document.getElementById('error-overlay');
-    const errorBox = document.getElementById('error-box');
-    const errorText = document.getElementById('error-text');
+                    querySnapshot.forEach(function (doc) {
+                        const data = doc.data();
+                        const growidResult = document.createElement('p');
+                        growidResult.textContent = data.growid;
+                        growidResult.addEventListener('click', function () {
+                            window.location.href = 'https://bfgpz.github.io/profile/?id=' + data.growid;
+                        });
+                        resultsContainer.appendChild(growidResult);
+                    });
 
-    errorText.textContent = errorMessage;
-    errorOverlay.style.display = 'block';
-    errorBox.style.display = 'block';
-}
+                    if (querySnapshot.empty) {
+                        resultsContainer.innerHTML = '<p>No results found.</p>';
+                    }
 
-function closeErrorBox() {
-    const errorOverlay = document.getElementById('error-overlay');
-    const errorBox = document.getElementById('error-box');
-    errorOverlay.style.display = 'none';
-    errorBox.style.display = 'none';
-}
+                    document.getElementById('searchResultsSection').style.display = 'block';
+                })
+                .catch(function (error) {
+                    showErrorBox("Error searching GrowID. Please try again.");
+                    console.error('Error searching GrowID. Please try again.', error);
+                });
+        }
 
+        function showErrorBox(errorMessage) {
+            const errorOverlay = document.getElementById('error-overlay');
+            const errorBox = document.getElementById('error-box');
+            const errorText = document.getElementById('error-text');
 
+            errorText.textContent = errorMessage;
+            errorOverlay.style.display = 'block';
+            errorBox.style.display = 'block';
+        }
+
+        function closeErrorBox() {
+            const errorOverlay = document.getElementById('error-overlay');
+            const errorBox = document.getElementById('error-box');
+            errorOverlay.style.display = 'none';
+            errorBox.style.display = 'none';
+        }
 
         window.onload = function () {
             checkLoginStatus();
