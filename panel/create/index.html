@@ -117,12 +117,11 @@
 
 <body>
     <header>
-        <h1><a href="https://bfgpz.github.io/">BfgPz Website</a></h1>
+        <h1><a href="https://bfgpz.github.io/panel">BfgPz Panel</a></h1>
         <nav>
             <ul>
-                <li><a href="https://bfgpz.github.io/faq">Faq</a></li>
-                <li><a id="panelbut" href="https://bfgpz.github.io/panel">Panel</a></li>
-                <li><a id="loginbut" href="#"> </a></li>
+                <li><a href="https://bfgpz.github.io/">Home</a></li>
+                <li><a onclick="logout()" href="#">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -170,24 +169,11 @@
         const formattedDate = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')}`;
 
         function checkLoginStatus() {
-            var loginButton = document.getElementById('loginbut');
-            var panelButton = document.getElementById('panelbut');
-
             firebase.auth().onAuthStateChanged(function (user) {
                 if (user) {
-                    loginButton.textContent = 'Logout';
-                    loginButton.setAttribute('href', '#');
-                    loginButton.setAttribute('onclick', 'logout()');
-                    loginButton.style.marginLeft = '0px';
-                    panelButton.style.display = 'block';
-                    panelButton.style.visibility = 'visible';
+
                 } else {
-                    loginButton.textContent = 'Login';
-                    loginButton.setAttribute('href', 'https://bfgpz.github.io/panel/login');
-                    loginButton.removeAttribute('onclick');
-                    panelButton.style.display = 'none';
-                    panelButton.style.visibility = 'hidden';
-                    loginButton.style.marginLeft = '-20px';
+                    window.location.href = 'https://bfgpz.github.io/panel/login';
                 }
             });
         }
@@ -220,6 +206,14 @@
                     console.error('Error adding GrowID: ', error);
                     alert('Error adding GrowID.');
                 });
+        }
+
+        function logout() {
+            firebase.auth().signOut().then(function () {
+                checkLoginStatus();
+            }).catch(function (error) {
+                console.error('Error during logout:', error);
+            });
         }
 
         window.onload = function () {
