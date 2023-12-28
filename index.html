@@ -249,47 +249,61 @@
         }
 
 function searchGrowID() {
-   const searchGrowidInput = document.getElementById('searchGrowid').value;
-   const errorOverlay = document.getElementById('error-overlay');
-   const errorBox = document.getElementById('error-box');
-   const errorText = document.getElementById('error-text');
+    const searchGrowidInput = document.getElementById('searchGrowid').value;
 
-   if (searchGrowidInput.trim() === '') {
-      // Display error if search input is empty
-      errorText.textContent = "Search Input Is empty!";
-      errorOverlay.style.display = 'block';
-      errorBox.style.display = 'block';
-      return;
-   }
+    // Check if the search input is empty
+    if (!searchGrowidInput.trim()) {
+        showErrorBox("Search Input Is empty!");
+        return;
+    }
 
-   db.collection('growids')
-      .where('growid', '>=', searchGrowidInput)
-      .where('growid', '<=', searchGrowidInput + '\uf8ff')
-      .get()
-      .then(function (querySnapshot) {
-         const resultsContainer = document.getElementById('searchResults');
-         resultsContainer.innerHTML = '';
+    db.collection('growids')
+        .where('growid', '>=', searchGrowidInput)
+        .where('growid', '<=', searchGrowidInput + '\uf8ff')
+        .get()
+        .then(function (querySnapshot) {
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = '';
 
-         querySnapshot.forEach(function (doc) {
-            const data = doc.data();
-            const growidResult = document.createElement('p');
-            growidResult.textContent = data.growid;
-            growidResult.addEventListener('click', function () {
-               window.location.href = 'https://bfgpz.github.io/profile/?id=' + data.growid;
+            querySnapshot.forEach(function (doc) {
+                const data = doc.data();
+                const growidResult = document.createElement('p');
+                growidResult.textContent = data.growid;
+                growidResult.addEventListener('click', function () {
+                    window.location.href = 'https://bfgpz.github.io/profile/?id=' + data.growid;
+                });
+                resultsContainer.appendChild(growidResult);
             });
-            resultsContainer.appendChild(growidResult);
-         });
 
-         if (querySnapshot.empty) {
-            resultsContainer.innerHTML = '<p>No results found.</p>';
-         }
+            if (querySnapshot.empty) {
+                resultsContainer.innerHTML = '<p>No results found.</p>';
+            }
 
-         document.getElementById('searchResultsSection').style.display = 'block';
-      })
-      .catch(function (error) {
-         console.error('Error searching GrowID. Please try again.', error);
-      });
+            document.getElementById('searchResultsSection').style.display = 'block';
+        })
+        .catch(function (error) {
+            showErrorBox("Error searching GrowID. Please try again.");
+            console.error('Error searching GrowID. Please try again.', error);
+        });
 }
+
+function showErrorBox(errorMessage) {
+    const errorOverlay = document.getElementById('error-overlay');
+    const errorBox = document.getElementById('error-box');
+    const errorText = document.getElementById('error-text');
+
+    errorText.textContent = errorMessage;
+    errorOverlay.style.display = 'block';
+    errorBox.style.display = 'block';
+}
+
+function closeErrorBox() {
+    const errorOverlay = document.getElementById('error-overlay');
+    const errorBox = document.getElementById('error-box');
+    errorOverlay.style.display = 'none';
+    errorBox.style.display = 'none';
+}
+
 
 
         window.onload = function () {
