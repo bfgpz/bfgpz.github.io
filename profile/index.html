@@ -173,52 +173,54 @@
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
 
-        if (id) {
-            const db = firebase.firestore();
+    if (id) {
+        const db = firebase.firestore();
 
-            db.collection('growids')
-                .where('growid', '==', id)
-                .get()
-                .then(function (querySnapshot) {
-                    const profileContent = document.getElementById('profileContent');
+        db.collection('growids')
+            .where('growid', '==', id)
+            .get()
+            .then(function (querySnapshot) {
+                const profileContent = document.getElementById('profileContent');
 
-                    if (!querySnapshot.empty) {
-                        const data = querySnapshot.docs[0].data();
+                if (!querySnapshot.empty) {
+                    const data = querySnapshot.docs[0].data();
 
-                        profileContent.innerHTML = '';
+                    profileContent.innerHTML = '';
 
-                        profileContent.innerHTML += `<p>GrowID: ${data.growid || ''}</p>`;
-                        profileContent.innerHTML += `<p>Wls: ${data.wls || ''}</p>`;
+                    profileContent.innerHTML += `<p>GrowID: ${data.growid || ''}</p>`;
+                    profileContent.innerHTML += `<p>Wls: ${data.wls || ''}</p>`;
 
-                        if (data.days === 'inf') {
-                            profileContent.innerHTML += `<p>Status: <span style="color: green;">Active (∞ Days Left)</span></p>`;
-                        } else {
-                            const currentDate = new Date();
-                            const growIDDate = new Date(data.date);
-                            const expirationDays = parseInt(data.days) || 0;
-
-                            growIDDate.setDate(growIDDate.getDate() + expirationDays);
-
-                            if (currentDate > growIDDate) {
-                                profileContent.innerHTML += `<p>Status: <span style="color: red;">Expired</span></p>`;
-                            } else {
-                                const remainingDays = Math.ceil((growIDDate - currentDate) / (1000 * 60 * 60 * 24));
-                                profileContent.innerHTML += `<p>Status: <span style="color: green;">Active</span><span style="opacity: 0.5;"> (${remainingDays} Days Left)</span></p>`;
-                            }
-                        }
+                    if (data.days === 'inf') {
+                        profileContent.innerHTML += `<p>Status: <span style="color: green;">Active (∞ Days Left)</span></p>`;
                     } else {
-                        window.location.href = 'https://bfgpz.github.io/';
+                        const currentDate = new Date();
+                        const growIDDate = new Date(data.date);
+                        const expirationDays = parseInt(data.days) || 0;
+
+                        growIDDate.setDate(growIDDate.getDate() + expirationDays);
+
+                        if (currentDate > growIDDate) {
+                            profileContent.innerHTML += `<p>Status: <span style="color: red;">Expired</span></p>`;
+                        } else {
+                            const remainingTime = growIDDate - currentDate;
+                            const remainingDays = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
+                            const remainingHours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+                            profileContent.innerHTML += `<p>Status: <span style="color: green;">Active</span><span style="opacity: 0.5;"> (${remainingDays} Days and ${remainingHours} Hours Left)</span></p>`;
+                        }
                     }
-                })
-                .catch(function (error) {
-                    
-                    alert('Error fetching.');
-		    window.location.href = 'https://bfgpz.github.io/';
-                });
-        } else {
-            alert('No GrowID specified');
-			window.location.href = 'https://bfgpz.github.io/';
-        }
+                } else {
+                    window.location.href = 'https://bfgpz.github.io/';
+                }
+            })
+            .catch(function (error) {
+                alert('Error fetching.');
+                window.location.href = 'https://bfgpz.github.io/';
+            });
+    } else {
+        alert('No GrowID specified');
+        window.location.href = 'https://bfgpz.github.io/';
+    }
     </script>
 </body>
 
