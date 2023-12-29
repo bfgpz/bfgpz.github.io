@@ -169,9 +169,9 @@
             appId: "1:821260336906:web:f5a9748620aec518fb84f3"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
+firebase.initializeApp(firebaseConfig);
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get('id');
 
     if (id) {
         const db = firebase.firestore();
@@ -194,15 +194,15 @@
                         profileContent.innerHTML += `<p>Status: <span style="color: green;">Active (∞ Days Left)</span></p>`;
                     } else {
                         const currentDate = new Date();
-                        const growIDDate = new Date(data.date);
+                        const growIDDateTime = new Date(`${data.date}T${data.time}`);
                         const expirationDays = parseInt(data.days) || 0;
 
-                        growIDDate.setDate(growIDDate.getDate() + expirationDays);
+                        growIDDateTime.setDate(growIDDateTime.getDate() + expirationDays);
 
-                        if (currentDate > growIDDate) {
+                        if (currentDate > growIDDateTime) {
                             profileContent.innerHTML += `<p>Status: <span style="color: red;">Expired</span></p>`;
                         } else {
-                            const remainingTime = growIDDate - currentDate;
+                            const remainingTime = growIDDateTime - currentDate;
                             const remainingDays = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
                             const remainingHours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
