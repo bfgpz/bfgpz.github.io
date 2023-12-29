@@ -192,7 +192,8 @@
             const growidInput = document.getElementById('growidInput').value;
             const wlsInput = document.getElementById('wls').value;
             const daysInput = document.getElementById('days').value;
-
+            daysInput.value = parseInt(daysInput.value) + 1;
+            
             db.collection('growids').add({
                 growid: growidInput,
                 wls: wlsInput,
