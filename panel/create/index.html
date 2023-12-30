@@ -195,6 +195,7 @@
             const wlsInput = document.getElementById('wls').value;
             const daysInput = document.getElementById('days').value;
             const hoursInput = daysInput * 24;
+            console.log('Hours:', hoursInput);
             
             db.collection('growids').add({
                 growid: growidInput,
