@@ -194,11 +194,13 @@
             const growidInput = document.getElementById('growidInput').value;
             const wlsInput = document.getElementById('wls').value;
             const daysInput = document.getElementById('days').value;
+            const hoursInput = daysInput * 24;
             
             db.collection('growids').add({
                 growid: growidInput,
                 wls: wlsInput,
                 days: daysInput,
+                hours: hoursInput,
                 date: formattedDate,
                 time: formattedTime
             })
