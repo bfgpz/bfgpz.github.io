@@ -176,7 +176,7 @@
         if (id) {
             const db = firebase.firestore();
 
-            fetch('http://worldtimeapi.org/api/timezone/Europe/Vilnius')
+            fetch('https://worldtimeapi.org/api/timezone/Europe/Vilnius')
                 .then(response => response.json())
                 .then(data => {
                     const currentTime = new Date(data.utc_datetime);
