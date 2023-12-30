@@ -73,7 +73,6 @@
             background-color: #19252f;
             display: flex;
             flex-direction: column;
-		
         }
 
         section {
@@ -159,68 +158,79 @@
     </footer>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCxezHvx_VPjMv_w1vQprKuQC3bl7z0jK0",
-            authDomain: "bfgpzo.firebaseapp.com",
-            databaseURL: "https://bfgpzo-default-rtdb.firebaseio.com",
-            projectId: "bfgpzo",
-            storageBucket: "bfgpzo.appspot.com",
-            messagingSenderId: "821260336906",
-            appId: "1:821260336906:web:f5a9748620aec518fb84f3"
-        };
+	const firebaseConfig = {
+	  apiKey: "AIzaSyCxezHvx_VPjMv_w1vQprKuQC3bl7z0jK0",
+	  authDomain: "bfgpzo.firebaseapp.com",
+	  databaseURL: "https://bfgpzo-default-rtdb.firebaseio.com",
+	  projectId: "bfgpzo",
+	  storageBucket: "bfgpzo.appspot.com",
+	  messagingSenderId: "821260336906",
+	  appId: "1:821260336906:web:f5a9748620aec518fb84f3"
+	};
 
         firebase.initializeApp(firebaseConfig);
+
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
 
-    if (id) {
-        const db = firebase.firestore();
+        if (id) {
+            const db = firebase.firestore();
 
-        db.collection('growids')
-            .where('growid', '==', id)
-            .get()
-            .then(function (querySnapshot) {
-                const profileContent = document.getElementById('profileContent');
+            fetch('http://worldtimeapi.org/api/timezone/Europe/Vilnius')
+                .then(response => response.json())
+                .then(data => {
+                    const currentTime = new Date(data.utc_datetime);
 
-                if (!querySnapshot.empty) {
-                    const data = querySnapshot.docs[0].data();
+                    db.collection('growids')
+                        .where('growid', '==', id)
+                        .get()
+                        .then(function (querySnapshot) {
+                            const profileContent = document.getElementById('profileContent');
 
-                    profileContent.innerHTML = '';
+                            if (!querySnapshot.empty) {
+                                const profileData = querySnapshot.docs[0].data();
 
-                    profileContent.innerHTML += `<p>GrowID: ${data.growid || ''}</p>`;
-                    profileContent.innerHTML += `<p>Wls: ${data.wls || ''}</p>`;
+                                if (profileData.days.toLowerCase() === "inf") {
+                                    profileContent.innerHTML = '<p>Status: <span style="color: green;">Active</span> <span style="opacity: 0.5;">(∞ Days Left.)</span></p>';
+                                } else {
+                                    const startTime = new Date(profileData.date + 'T' + profileData.time);
+                                    const elapsedMilliseconds = currentTime - startTime;
+                                    const remainingMilliseconds = Math.max(0, profileData.hours * 60 * 60 * 1000 - elapsedMilliseconds);
+                                    const remainingDays = Math.floor(remainingMilliseconds / (1000 * 60 * 60 * 24));
+                                    const remainingHours = Math.floor((remainingMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                    const remainingMinutes = Math.floor((remainingMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
 
-                    if (data.days === 'inf') {
-                        profileContent.innerHTML += `<p>Status: <span style="color: green;">Active (∞ Days Left)</span></p>`;
-                    } else {
-                        const currentDate = new Date();
-                        const growIDDate = new Date(data.date);
-                        const expirationDays = parseInt(data.days) || 0;
+                                    let remainingTimeHTML = '';
 
-                        growIDDate.setDate(growIDDate.getDate() + expirationDays);
+                                    if (remainingDays > 0) {
+                                        remainingTimeHTML += `${remainingDays}D `;
+                                    }
 
-                        if (currentDate > growIDDate) {
-                            profileContent.innerHTML += `<p>Status: <span style="color: red;">Expired</span></p>`;
-                        } else {
-                            const remainingTime = growIDDate - currentDate;
-                            const remainingDays = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-                            const remainingHours = Math.floor((remainingTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                    if (remainingHours > 0) {
+                                        remainingTimeHTML += `${remainingHours}H `;
+                                    }
 
-                            profileContent.innerHTML += `<p>Status: <span style="color: green;">Active</span><span style="opacity: 0.5;"> (${remainingDays} Days and ${remainingHours} Hours Left)</span></p>`;
-                        }
-                    }
-                } else {
-                    window.location.href = 'https://bfgpz.github.io/';
-                }
-            })
-            .catch(function (error) {
-                alert('Error fetching.');
-                window.location.href = 'https://bfgpz.github.io/';
-            });
-    } else {
-        alert('No GrowID specified');
-        window.location.href = 'https://bfgpz.github.io/';
-    }
+                                    if (remainingMinutes > 0) {
+                                        remainingTimeHTML += `${remainingMinutes}M `;
+                                    }
+
+                                    if (elapsedMilliseconds >= profileData.hours * 60 * 60 * 1000) {
+                                        profileContent.innerHTML = '<p>Status: <span style="color: red;">Expired!</span></p>';
+                                        profileContent.innerHTML += `<p>GrowID: ${profileData.growid || ''}</p>`;
+                                        profileContent.innerHTML += `<p>Wls: ${profileData.wls || ''}</p>`;
+                                    } else {
+                                        profileContent.innerHTML = `<p>Status: <span style="color: green;">Active</span> <span style="opacity: 0.5;">(${remainingTimeHTML}Left.)</span></p>`;
+                                        profileContent.innerHTML += `<p>GrowID: ${profileData.growid || ''}</p>`;
+                                        profileContent.innerHTML += `<p>Wls: ${profileData.wls || ''}</p>`;
+                                    }
+                                }
+                            } else {
+                                window.location.href = 'https://bfgpz.github.io/';
+                            }
+                        });
+                })
+                .catch(error => console.error('Error fetching time from World Time API:', error));
+        }
     </script>
 </body>
 
