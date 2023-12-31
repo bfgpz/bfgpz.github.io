@@ -234,41 +234,45 @@ async function populateGrowIDsTable() {
         
 async function getStatusHTML(data) {
     const profileContent = document.createElement('div');
-
+    
     try {
         const response = await fetch('https://worldtimeapi.org/api/timezone/Europe/Vilnius');
         const result = await response.json();
+        console.log('Current Time:', currentTime);
 
         if (response.ok) {
             const currentTime = new Date(result.utc_datetime);
+            
 
-            const startTime = new Date(data.date + 'T' + data.time);
-            const elapsedMilliseconds = currentTime - startTime;
-            const remainingMilliseconds = Math.max(0, data.hours * 60 * 60 * 1000 - elapsedMilliseconds);
-            const remainingDays = Math.floor(remainingMilliseconds / (1000 * 60 * 60 * 24));
-            const remainingHours = Math.floor((remainingMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const remainingMinutes = Math.floor((remainingMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
-
-            let remainingTimeHTML = '';
-
-            if (remainingDays > 0) {
-                remainingTimeHTML += `${remainingDays}D `;
-            }
-
-            if (remainingHours > 0) {
-                remainingTimeHTML += `${remainingHours}H `;
-            }
-
-            if (remainingMinutes > 0) {
-                remainingTimeHTML += `${remainingMinutes}M`;
-            }
-
-            console.log('Current Time:', currentTime);  // Log the current time to the console
-
-            if (elapsedMilliseconds >= data.hours * 60 * 60 * 1000) {
-                profileContent.innerHTML = '<span style="color: red;">Expired!</span></p>';
+            if (data.days === 'inf') {
+                profileContent.innerHTML = `<p><span style="opacity: 0.5;">∞ D</span></p>`;
             } else {
-                profileContent.innerHTML = `<p><span style="opacity: 0.5;">${remainingTimeHTML}</span></p>`;
+                const startTime = new Date(data.date + 'T' + data.time);
+                const elapsedMilliseconds = currentTime - startTime;
+                const remainingMilliseconds = Math.max(0, data.hours * 60 * 60 * 1000 - elapsedMilliseconds);
+                const remainingDays = Math.floor(remainingMilliseconds / (1000 * 60 * 60 * 24));
+                const remainingHours = Math.floor((remainingMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const remainingMinutes = Math.floor((remainingMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+
+                let remainingTimeHTML = '';
+
+                if (remainingDays > 0) {
+                    remainingTimeHTML += `${remainingDays}D `;
+                }
+
+                if (remainingHours > 0) {
+                    remainingTimeHTML += `${remainingHours}H `;
+                }
+
+                if (remainingMinutes > 0) {
+                    remainingTimeHTML += `${remainingMinutes}M`;
+                }
+
+                if (elapsedMilliseconds >= data.hours * 60 * 60 * 1000) {
+                    profileContent.innerHTML = '<span style="color: red;">Expired!</span></p>';
+                } else {
+                    profileContent.innerHTML = `<p><span style="opacity: 0.5;">${remainingTimeHTML}</span></p>`;
+                }
             }
         } else {
             console.error('Failed to fetch current time from World Time API:', result);
@@ -279,6 +283,7 @@ async function getStatusHTML(data) {
 
     return profileContent.innerHTML;
 }
+
 
 
     
