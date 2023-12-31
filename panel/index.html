@@ -241,7 +241,7 @@ async function getStatusHTML(data) {
 
         if (response.ok) {
             const currentTime = new Date(result.utc_datetime);
-            console.log('Current Time:', currentTime);  // Log the current time to the console
+            console.log('Time:', currentTime);  // Log the current time to the console
 
             const startTime = new Date(data.date + 'T' + data.time);
             const elapsedMilliseconds = currentTime - startTime;
