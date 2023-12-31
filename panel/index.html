@@ -225,8 +225,8 @@
 
               
 
-if (elapsedMilliseconds >= data.hours * 60 * 60 * 1000) {
-            profileContent.innerHTML = '<p style="color: red; margin: 10px 0 5px 0;">Expired!</p>';
+        if (elapsedMilliseconds >= data.hours * 60 * 60 * 1000) {
+            profileContent.innerHTML = '<p style="color: red; margin: 10px 0 5px 0; line-height: 1.5;">Expired!</p>';
         } else {
             profileContent.innerHTML = `<p style="margin: 5px 0;"><span style="opacity: 0.5;">${remainingTimeHTML}</span></p>`;
         }
