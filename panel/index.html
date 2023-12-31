@@ -239,27 +239,42 @@
         }
 
         function getStatusHTML(data) {
-            const profileContent = document.createElement('div');
+    const profileContent = document.createElement('div');
 
-            if (data.days === 'inf') {
-                profileContent.innerHTML = `<p><span style="color: green;">∞ Days</span></p>`;
-            } else {
-                const currentDate = new Date();
-                const growIDDate = new Date(data.date);
-                const expirationDays = parseInt(data.days) || 0;
+    if (data.days === 'inf') {
+        profileContent.innerHTML = `<p>Status: <span style="color: green;">Active</span> <span style="opacity: 0.5;">(∞ Days Left.)</span></p>`;
+    } else {
+        const currentTime = new Date();
+        const startTime = new Date(data.date + 'T' + data.time);
+        const elapsedMilliseconds = currentTime - startTime;
+        const remainingMilliseconds = Math.max(0, data.hours * 60 * 60 * 1000 - elapsedMilliseconds);
+        const remainingDays = Math.floor(remainingMilliseconds / (1000 * 60 * 60 * 24));
+        const remainingHours = Math.floor((remainingMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const remainingMinutes = Math.floor((remainingMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
 
-                growIDDate.setDate(growIDDate.getDate() + expirationDays);
+        let remainingTimeHTML = '';
 
-                if (currentDate > growIDDate) {
-                    profileContent.innerHTML = `<p><span style="color: red;">Expired</span></p>`;
-                } else {
-                    const remainingDays = Math.ceil((growIDDate - currentDate) / (1000 * 60 * 60 * 24));
-                    profileContent.innerHTML = `<p><span style="color: green;">${remainingDays} Days</span></p>`;
-                }
-            }
-
-            return profileContent.innerHTML;
+        if (remainingDays > 0) {
+            remainingTimeHTML += `${remainingDays}D & `;
         }
+
+        if (remainingHours > 0) {
+            remainingTimeHTML += `${remainingHours}H & `;
+        }
+
+        if (remainingMinutes > 0) {
+            remainingTimeHTML += `${remainingMinutes}M `;
+        }
+
+        if (elapsedMilliseconds >= data.hours * 60 * 60 * 1000) {
+            profileContent.innerHTML = '<p>Status: <span style="color: red;">Expired!</span></p>';
+        } else {
+            profileContent.innerHTML = `<p>Status: <span style="color: green;">Active</span> <span style="opacity: 0.5;">(${remainingTimeHTML}Left.)</span></p>`;
+        }
+    }
+
+    return profileContent.innerHTML;
+}
 
         function deleteGrowID(growid) {
             var confirmDelete = confirm("Delete GrowID?");
