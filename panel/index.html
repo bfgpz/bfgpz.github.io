@@ -231,43 +231,55 @@
                 });
         }
 
-        function getStatusHTML(data) {
+        
+async function getStatusHTML(data) {
     const profileContent = document.createElement('div');
 
-    if (data.days === 'inf') {
-        profileContent.innerHTML = `<p><span style="opacity: 0.5;">∞ D</span></p>`;
-    } else {
-        const currentTime = new Date();
-        const startTime = new Date(data.date + 'T' + data.time);
-        const elapsedMilliseconds = currentTime - startTime;
-        const remainingMilliseconds = Math.max(0, data.hours * 60 * 60 * 1000 - elapsedMilliseconds);
-        const remainingDays = Math.floor(remainingMilliseconds / (1000 * 60 * 60 * 24));
-        const remainingHours = Math.floor((remainingMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const remainingMinutes = Math.floor((remainingMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+    try {
+        const response = await fetch('https://worldtimeapi.org/api/timezone/Europe/Vilnius');
+        const result = await response.json();
 
-        let remainingTimeHTML = '';
+        if (response.ok) {
+            const currentTime = new Date(result.utc_datetime);
+            console.log('Current Time:', currentTime);  // Log the current time to the console
 
-        if (remainingDays > 0) {
-            remainingTimeHTML += `${remainingDays}D `;
-        }
+            const startTime = new Date(data.date + 'T' + data.time);
+            const elapsedMilliseconds = currentTime - startTime;
+            const remainingMilliseconds = Math.max(0, data.hours * 60 * 60 * 1000 - elapsedMilliseconds);
+            const remainingDays = Math.floor(remainingMilliseconds / (1000 * 60 * 60 * 24));
+            const remainingHours = Math.floor((remainingMilliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const remainingMinutes = Math.floor((remainingMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
 
-        if (remainingHours > 0) {
-            remainingTimeHTML += `${remainingHours}H `;
-        }
+            let remainingTimeHTML = '';
 
-        if (remainingMinutes > 0) {
-            remainingTimeHTML += `${remainingMinutes}M`;
-        }
+            if (remainingDays > 0) {
+                remainingTimeHTML += `${remainingDays}D `;
+            }
 
-        if (elapsedMilliseconds >= data.hours * 60 * 60 * 1000) {
-            profileContent.innerHTML = '<span style="color: red;">Expired!</span></p>';
+            if (remainingHours > 0) {
+                remainingTimeHTML += `${remainingHours}H `;
+            }
+
+            if (remainingMinutes > 0) {
+                remainingTimeHTML += `${remainingMinutes}M`;
+            }
+
+            if (elapsedMilliseconds >= data.hours * 60 * 60 * 1000) {
+                profileContent.innerHTML = '<span style="color: red;">Expired!</span></p>';
+            } else {
+                profileContent.innerHTML = `<p><span style="opacity: 0.5;">${remainingTimeHTML}</span></p>`;
+            }
         } else {
-            profileContent.innerHTML = `<p><span style="opacity: 0.5;">${remainingTimeHTML}</span></p>`;
+            console.error('Failed to fetch current time from World Time API:', result);
         }
+    } catch (error) {
+        console.error('Error fetching current time from World Time API:', error);
     }
 
     return profileContent.innerHTML;
 }
+
+    
 
         function deleteGrowID(growid) {
             var confirmDelete = confirm("Delete GrowID?");
