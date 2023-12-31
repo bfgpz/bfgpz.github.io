@@ -206,7 +206,7 @@
                         const growidRow = document.createElement('tr');
 
                         const growidCell = document.createElement('td');
-                        growidCell.textContent = data.growid.length > 6 ? data.growid.substring(0, 5) + '...' : data.growid;
+                        growidCell.textContent = data.growid.length > 7 ? data.growid.substring(0, 6) + '...' : data.growid;
                         growidRow.appendChild(growidCell);
 
                         const statusCell = document.createElement('td');
@@ -242,7 +242,7 @@
     const profileContent = document.createElement('div');
 
     if (data.days === 'inf') {
-        profileContent.innerHTML = `<p>Status: <span style="color: green;">Active</span> <span style="opacity: 0.5;">(∞ Days Left.)</span></p>`;
+        profileContent.innerHTML = `<p><span style="opacity: 0.5;">∞ D</span></p>`;
     } else {
         const currentTime = new Date();
         const startTime = new Date(data.date + 'T' + data.time);
@@ -255,15 +255,15 @@
         let remainingTimeHTML = '';
 
         if (remainingDays > 0) {
-            remainingTimeHTML += `${remainingDays}D & `;
+            remainingTimeHTML += `${remainingDays}D `;
         }
 
         if (remainingHours > 0) {
-            remainingTimeHTML += `${remainingHours}H & `;
+            remainingTimeHTML += `${remainingHours}H `;
         }
 
         if (remainingMinutes > 0) {
-            remainingTimeHTML += `${remainingMinutes}M `;
+            remainingTimeHTML += `${remainingMinutes}`;
         }
 
         if (elapsedMilliseconds >= data.hours * 60 * 60 * 1000) {
