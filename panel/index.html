@@ -188,51 +188,7 @@
             });
         }
 
-async function populateGrowIDsTable() {
-    const growidTableBody = document.getElementById('growidTableBody');
-
-    try {
-        const querySnapshot = await db.collection('growids').get();
-
-        querySnapshot.forEach(async function (doc) {
-            const data = doc.data();
-            const growidRow = document.createElement('tr');
-
-            const growidCell = document.createElement('td');
-            growidCell.textContent = data.growid.length > 7 ? data.growid.substring(0, 6) + '...' : data.growid;
-            growidRow.appendChild(growidCell);
-
-            const statusCell = document.createElement('td');
-            statusCell.innerHTML = await getStatusHTML(data);  // Use await here
-            growidRow.appendChild(statusCell);
-
-            const actionCell = document.createElement('td');
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.addEventListener('click', function () {
-                deleteGrowID(data.growid);
-            });
-            actionCell.appendChild(deleteButton);
-
-            const viewProfileButton = document.createElement('button');
-            viewProfileButton.textContent = 'Profile';
-            viewProfileButton.addEventListener('click', function () {
-                viewProfile(data.growid);
-            });
-            actionCell.appendChild(viewProfileButton);
-
-            growidRow.appendChild(actionCell);
-
-            growidTableBody.appendChild(growidRow);
-        });
-    } catch (error) {
-        console.error('Error populating GrowIDs table:', error);
-    }
-}
-
-
-        
-async function getStatusHTML(data) {
+        async function getStatusHTML(data) {
     const profileContent = document.createElement('div');
     
     try {
@@ -282,6 +238,52 @@ async function getStatusHTML(data) {
 
     return profileContent.innerHTML;
 }
+        
+async function populateGrowIDsTable() {
+    const growidTableBody = document.getElementById('growidTableBody');
+
+    try {
+        const querySnapshot = await db.collection('growids').get();
+
+        querySnapshot.forEach(async function (doc) {
+            const data = doc.data();
+            const growidRow = document.createElement('tr');
+
+            const growidCell = document.createElement('td');
+            growidCell.textContent = data.growid.length > 7 ? data.growid.substring(0, 6) + '...' : data.growid;
+            growidRow.appendChild(growidCell);
+
+            const statusCell = document.createElement('td');
+            statusCell.innerHTML = await getStatusHTML(data);  // Use await here
+            growidRow.appendChild(statusCell);
+
+            const actionCell = document.createElement('td');
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', function () {
+                deleteGrowID(data.growid);
+            });
+            actionCell.appendChild(deleteButton);
+
+            const viewProfileButton = document.createElement('button');
+            viewProfileButton.textContent = 'Profile';
+            viewProfileButton.addEventListener('click', function () {
+                viewProfile(data.growid);
+            });
+            actionCell.appendChild(viewProfileButton);
+
+            growidRow.appendChild(actionCell);
+
+            growidTableBody.appendChild(growidRow);
+        });
+    } catch (error) {
+        console.error('Error populating GrowIDs table:', error);
+    }
+}
+
+
+        
+
 
 
 
@@ -326,6 +328,7 @@ async function getStatusHTML(data) {
         window.onload = function () {
             checkLoginStatus();
             populateGrowIDsTable();
+            console.log(currentTime);
         };
     </script>
 </body>
