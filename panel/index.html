@@ -188,48 +188,48 @@
             });
         }
 
-        function populateGrowIDsTable() {
-            const growidTableBody = document.getElementById('growidTableBody');
+async function populateGrowIDsTable() {
+    const growidTableBody = document.getElementById('growidTableBody');
 
-            db.collection('growids')
-                .get()
-                .then(function (querySnapshot) {
-                    querySnapshot.forEach(function (doc) {
-                        const data = doc.data();
-                        const growidRow = document.createElement('tr');
+    try {
+        const querySnapshot = await db.collection('growids').get();
 
-                        const growidCell = document.createElement('td');
-                        growidCell.textContent = data.growid.length > 7 ? data.growid.substring(0, 6) + '...' : data.growid;
-                        growidRow.appendChild(growidCell);
+        querySnapshot.forEach(async function (doc) {
+            const data = doc.data();
+            const growidRow = document.createElement('tr');
 
-                        const statusCell = document.createElement('td');
-                        statusCell.innerHTML = getStatusHTML(data);
-                        growidRow.appendChild(statusCell);
+            const growidCell = document.createElement('td');
+            growidCell.textContent = data.growid.length > 7 ? data.growid.substring(0, 6) + '...' : data.growid;
+            growidRow.appendChild(growidCell);
 
-                        const actionCell = document.createElement('td');
-                        const deleteButton = document.createElement('button');
-                        deleteButton.textContent = 'Delete';
-                        deleteButton.addEventListener('click', function () {
-                            deleteGrowID(data.growid);
-                        });
-                        actionCell.appendChild(deleteButton);
+            const statusCell = document.createElement('td');
+            statusCell.innerHTML = await getStatusHTML(data);  // Use await here
+            growidRow.appendChild(statusCell);
 
-                        const viewProfileButton = document.createElement('button');
-                        viewProfileButton.textContent = 'Profile';
-                        viewProfileButton.addEventListener('click', function () {
-                            viewProfile(data.growid);
-                        });
-                        actionCell.appendChild(viewProfileButton);
+            const actionCell = document.createElement('td');
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', function () {
+                deleteGrowID(data.growid);
+            });
+            actionCell.appendChild(deleteButton);
 
-                        growidRow.appendChild(actionCell);
+            const viewProfileButton = document.createElement('button');
+            viewProfileButton.textContent = 'Profile';
+            viewProfileButton.addEventListener('click', function () {
+                viewProfile(data.growid);
+            });
+            actionCell.appendChild(viewProfileButton);
 
-                        growidTableBody.appendChild(growidRow);
-                    });
-                })
-                .catch(function (error) {
-                    console.error('Error populating GrowIDs table:', error);
-                });
-        }
+            growidRow.appendChild(actionCell);
+
+            growidTableBody.appendChild(growidRow);
+        });
+    } catch (error) {
+        console.error('Error populating GrowIDs table:', error);
+    }
+}
+
 
         
 async function getStatusHTML(data) {
